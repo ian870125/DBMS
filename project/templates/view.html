@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <title>List</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles_index.css') }}">  
+</head>  
+<body class="left_body">  
+    <header> 
+        <h2 class="logo">豬逼運彩下注網</h2>
+        <nav class="navigation">
+            <a href="/add">會員註冊</a>
+            <a href ="/view">會員資訊</a>
+            <a href="/login">會員登入</a>
+            <a herf="/money_add">入金</a>
+            <a herf="/gameplay">下注玩法</a>
+        </nav>
+    </header>
+        <h3>會員資訊</h3><br>  
+        <table border=1>  
+            <thead>  
+                <td>memberId</td>  
+                <td>birthday</td>  
+                <td>identity</td>
+                <td>account</td>
+                <td>money</td>  
+            </thead>  
+            
+            {% for row in rows %}  
+            
+                <tr>  
+                    <td>{{row["memberId"]}}</td>   
+                    <td>{{row["birthday"]}}</td>  
+                    <td>{{row["identity"]}}</td>
+                    <td>{{row["account"]}}</td>
+                    <td>{{row["money"]}}</td>
+                </tr>  
+            
+            {% endfor %}  
+        </table>  
+<br><br>  
+   
+<a href="/">Go back to home page</a>  
+   
+</body>  
+</html>
