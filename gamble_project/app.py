@@ -99,7 +99,7 @@ def view3():
 #NBA球隊資訊
 @app.route("/team")
 def team():
-    con = sqlite3.connect("C:/Users/ian/Desktop/sql/gamble_project/Gamble.db")  
+    con = sqlite3.connect("Gamble.db")  
     con.row_factory = sqlite3.Row  
     cur = con.cursor()  
     cur.execute("Select * from NBA_playoff_teams  ") 
@@ -109,7 +109,7 @@ def team():
 @app.route("/player")
 #NBA球員資訊
 def player():
-    con = sqlite3.connect("C:/Users/ian/Desktop/sql/gamble_project/Gamble.db")  
+    con = sqlite3.connect("Gamble.db")  
     con.row_factory = sqlite3.Row  
     cur = con.cursor()  
     cur.execute("Select * from NBA_playoff_players  ") 
