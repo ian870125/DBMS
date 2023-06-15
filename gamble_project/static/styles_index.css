@@ -14,8 +14,10 @@
     min-height: 100vh;
     background: #fff;
 
-
 }
+table {
+    margin-top: 20px; /* 调整表格的上边距为20像素 */
+  }
 .left_body{
     padding-top:  100px;
 }
