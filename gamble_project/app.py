@@ -96,8 +96,26 @@ def view3():
     rows = cur.fetchall()
       
     return render_template("view2.html",rows = rows)
-
-
+#NBA球隊資訊
+@app.route("/team")
+def team():
+    con = sqlite3.connect("Gamble.db")  
+    con.row_factory = sqlite3.Row  
+    cur = con.cursor()  
+    cur.execute("Select * from NBA_playoff_teams  ") 
+    rows = cur.fetchall()
+      
+    return render_template("team.html",rows = rows)
+@app.route("/player")
+#NBA球員資訊
+def player():
+    con = sqlite3.connect("Gamble.db")  
+    con.row_factory = sqlite3.Row  
+    cur = con.cursor()  
+    cur.execute("Select * from NBA_playoff_players  ") 
+    rows = cur.fetchall()
+      
+    return render_template("player.html",rows = rows)
 #登入網頁
 @app.route("/login")
 def login():
