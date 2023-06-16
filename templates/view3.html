@@ -1,0 +1,59 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <title>List</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles_index.css') }}">  
+    <style>
+        body {
+            text-align: center;
+        }
+
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid black;
+        }
+    </style>
+</head>  
+<body class="left_body">  
+    <header> 
+        <h2 class="logo">豬逼運彩下注網</h2>
+        <nav class="navigation">
+            <a href="/add">會員註冊</a>
+            <a href ="/view">比賽資訊</a>
+            <a href="/team">NBA 季後賽球隊資訊</a>
+            <a href="/player">NBA 季後賽球員資訊</a>
+            <a href="/login">會員登入</a>
+            <a href="/gameplay">下注玩法</a>
+        </nav>
+    </header>
+        <h3>系列賽資訊</h3><br>  
+        <table border=1>  
+            <thead>  
+                <td>賽事編號</td>
+                <td>主隊</td>
+                <td>客隊</td>  
+                <td>比賽日期</td>
+            </thead>  
+            
+            {% for row in rows %}  
+            
+                <tr>  
+                    <td>{{row["matchId"]}}</td>
+                    <td>{{row["home"]}}</td>
+                    <td>{{row["away"]}}</td>   
+                    <td>{{row["date"]}}</td>
+                </tr>  
+            
+            {% endfor %}  
+        </table>  
+<br><br>  
+   
+<a href="/">Go back to home page</a>  
+   
+</body>  
+</html>
