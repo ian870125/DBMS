@@ -29,7 +29,8 @@ body {
   
   input[name="memberId"],
   input[name="password"], 
-  input[name="money"]
+  input[name="money"],
+  select[name="action"]
   {
     padding: 10px;
     border-radius: 3px;

@@ -47,7 +47,17 @@ def request_loader(userpig):
 # 首頁
 @app.route("/")
 def index():
-    return render_template("index.html")
+    logged_in=False
+    session.clear()
+    login_manager.init_app
+    return render_template("index.html",logged_in=logged_in)
+
+
+@app.route("/index_in")
+@login_required
+def index_in():
+    logged_in=True
+    return render_template("index_in.html",logged_in=logged_in,user_id=current_user.id)
 
 
 # 加入會員網頁
@@ -85,12 +95,21 @@ def saveDetails():
 # 比賽資訊網頁
 @app.route("/view")
 def view():
-    return render_template("view_index.html")
+    #辨認是否登入
+    logged_in=False
+    if 'username' in session:
+        logged_in=True
+    return render_template("view_index.html",logged_in=logged_in)
 
 
 # 單場比賽資訊網頁
 @app.route("/view2")
 def view2():
+    #辨認是否登入
+    logged_in=False
+    if 'username' in session:
+        logged_in=True
+        
     con = sqlite3.connect("Gamble.db")
     con.row_factory = sqlite3.Row
     cur = con.cursor()
@@ -101,43 +120,58 @@ def view2():
     )
     con.commit()
     rows = cur.fetchall()
-    return render_template("view2.html", rows=rows)
+    return render_template("view2.html", rows=rows,logged_in=logged_in)
 
 
 # 系列賽比賽資訊網頁
 @app.route("/view3")
 def view3():
+    #辨認是否登入
+    logged_in=False
+    if 'username' in session:
+        logged_in=True
+    
     con = sqlite3.connect("Gamble.db")
     con.row_factory = sqlite3.Row
     cur = con.cursor()
     cur.execute("Select * from match_info WHERE `賽事種類` = '系列賽' Order By date")
     rows = cur.fetchall()
 
-    return render_template("view2.html", rows=rows)
+    return render_template("view2.html", rows=rows,logged_in=logged_in)
 
 
 # NBA球隊資訊
 @app.route("/team")
 def team():
+    #辨認是否登入
+    logged_in=False
+    if 'username' in session:
+        logged_in=True
+    
     con = sqlite3.connect("Gamble.db")
     con.row_factory = sqlite3.Row
     cur = con.cursor()
     cur.execute("Select * from NBA_playoff_teams  ")
     rows = cur.fetchall()
 
-    return render_template("team.html", rows=rows)
+    return render_template("team.html", rows=rows,logged_in=logged_in)
 
 
 # NBA球員資訊
 @app.route("/player")
 def player():
+    #辨認是否登入
+    logged_in=False
+    if 'username' in session:
+        logged_in=True
+    
     con = sqlite3.connect("Gamble.db")
     con.row_factory = sqlite3.Row
     cur = con.cursor()
     cur.execute("Select * from NBA_playoff_players  ")
     rows = cur.fetchall()
 
-    return render_template("player.html", rows=rows)
+    return render_template("player.html", rows=rows,logged_in=logged_in)
 
 
 # 登入網頁
@@ -149,6 +183,13 @@ def login():
 # 登戶會員後的動作
 @app.route("/login_result", methods=["POST"])
 def login_Result():
+    #辨認是否登入
+    username = request.form['memberId']
+    session['username'] = username
+    logged_in=False
+    if 'username' in session:
+        logged_in=True
+        
     con = sqlite3.connect("Gamble.db")
     cur = con.cursor()
 
@@ -164,7 +205,7 @@ def login_Result():
         if result:
             user = user_loader(memberId)
             login_user(user)
-            return render_template("index_in.html", user_id=current_user.id)
+            return render_template("index_in.html", user_id=current_user.id,logged_in=logged_in)
         else:
             flash("登入失敗了...")
     return redirect("/login")
@@ -174,6 +215,8 @@ def login_Result():
 @app.route("/logout")
 def logout():
     users = current_user.id
+    session.pop('username', None)
+    session.clear()
     logout_user()
     return render_template("logout.html", user=users)
 
@@ -256,12 +299,38 @@ def money_in_out_record():
     # 查詢 money_records 表格中屬於當前使用者的紀錄
     cur.execute(
         "SELECT action, amount, created_at FROM money_records WHERE user_id = ?",
-        (user_id,),
+        (user_id)
     )
     records = cur.fetchall()
 
     return render_template("money_in_out_record.html", records=records)
 
+@app.route("/gameplay")
+def gameplay():
+    #辨認是否登入
+    logged_in=False
+    if 'username' in session:
+        logged_in=True
+    
+    con = sqlite3.connect("Gamble.db")
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+    curr = con.cursor()
+    cur.execute(
+        "SELECT * FROM match_info WHERE date > DATE('2023-04-18') AND date = (SELECT date FROM match_info WHERE date > DATE('2023-04-18') Order By date asc);"
+    )
+    con.commit()
+    rows = cur.fetchall()
+    curr.execute(
+        "SELECT * FROM bet WHERE gametype = '單場賽事'; "
+    )
+    con.commit()
+    results = curr.fetchall()
+    
+    return render_template("gameplay_view2.html", rows=rows,results=results,logged_in=logged_in)
+
+
+    
 
 if __name__ == "__main__":
     app.run(debug=True)
