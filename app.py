@@ -114,10 +114,9 @@ def view2():
     con.row_factory = sqlite3.Row
     cur = con.cursor()
     date = "2023-04-18"
-    cur.execute()
     cur.execute(
         # "SELECT * FROM match_info WHERE date > DATE('2023-04-18') AND date = (SELECT date FROM single_match WHERE date > DATE('2023-04-18') Order By date asc);"
-        "SELECT * FROM match_info WHERE `賽gametype` = '單場賽場' Order By date;"
+        "SELECT * FROM match_info WHERE `gametype` = '單場賽場' Order By date;"
     )
     con.commit()
     rows = cur.fetchall()
