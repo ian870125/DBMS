@@ -298,8 +298,7 @@ def money_in_out_record():
 
     # 查詢 money_records 表格中屬於當前使用者的紀錄
     cur.execute(
-        "SELECT action, amount, created_at FROM money_records WHERE user_id = ?",
-        (user_id)
+        "SELECT action, amount, created_at FROM money_records WHERE user_id = ?",[user_id]
     )
     records = cur.fetchall()
 
@@ -307,11 +306,7 @@ def money_in_out_record():
 
 @app.route("/gameplay")
 def gameplay():
-    #辨認是否登入
     logged_in=False
-    if 'username' in session:
-        logged_in=True
-    
     con = sqlite3.connect("Gamble.db")
     con.row_factory = sqlite3.Row
     cur = con.cursor()
@@ -328,6 +323,28 @@ def gameplay():
     results = curr.fetchall()
     
     return render_template("gameplay_view2.html", rows=rows,results=results,logged_in=logged_in)
+
+#下注網頁
+@app.route("/bet_index")
+@login_required
+def bet_index():
+    user = current_user.id
+    return render_template("bet_index.html")
+@app.route("/bet1")
+@login_required
+def bet1():
+    con = sqlite3.connect("Gamble.db")
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+    date = '2023-04-18'
+    cur.execute("SELECT bet.matchId,match_info.home,match_info.away,bet.gametype,bet.gamble,bet.line FROM bet,match_info where gametype = '單場賽事' and match_info.matchId=bet.matchId and gametype = '單場賽事' and date > DATE('2023-04-18') and date = (SELECT date FROM match_info WHERE date > DATE('2023-04-18') Order By date asc);")
+    rows = cur.fetchall()
+    return render_template('bet1.html',rows=rows)
+
+@app.route("/bet2")
+def bet2():
+    con = sqlite3.connect("Gamble.db")
+    con.row_factory = sqlite3.Row
 
 
     
