@@ -6,21 +6,23 @@
         body {
             text-align: center;
         }
+        .container {
+            display: flex;
+            justify-content: center;
+        }
         table {
-            margin: 0 auto;
+            border-collapse: collapse;
         }
-        /* Add your custom styles here */
-        /* Example:
-        .logo {
-            color: red;
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
         }
-        */
     </style>
     <link rel="stylesheet" href="{{ url_for('static',filename='styles_index.css') }}">
 </head>
 <body class="left_body">
     <header>
-        <h2 class="logo">豬逼運彩下注網</h2>
+        <h2 class="logo">NBA 運彩下注網</h2>
         <nav class="navigation">
             <a href="/view">比賽資訊</a>
             <a href="/team">季後賽球隊資訊</a>
