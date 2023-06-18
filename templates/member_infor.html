@@ -1,11 +1,34 @@
 <!DOCTYPE html>
-<html>  
-<head>  
-<title>Flask Home</title>
-<meta charset="utf-8">
-<link rel="stylesheet" href="{{ url_for('static',filename='styles_index.css') }}">  
-</head>  
-<body class="center_body"> 
+<html>
+<head>
+    <title>Flask Home</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles_index.css') }}">
+    <style>
+        body {
+            text-align: center;
+        }
+        .center_body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .member_infor {
+            border-collapse: collapse;
+            width: 300px;
+        }
+        .member_infor th, .member_infor td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        .member_infor th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body class="center_body">
     <header>
         <h2 class="logo">NBA 運彩下注網</h2>
         <nav class="navigation">
@@ -18,10 +41,16 @@
             <a href="/logout">登出</a>
         </nav>
     </header>
-    
-    <table border=1 class="member_infor" width=300 >
-        <td><a href ="/bet_record">下注紀錄查詢<a></td>
-        <td><a href ="/operate_win">發放獎金<a></td>
+
+    <table class="member_infor">
+        <tr>
+            <th colspan="2">功能</th>
+        </tr>
+        <tr>
+            <td><a href="/bet_record">下注紀錄查詢</a></td>
+            <td><a href="/operate_win">發放獎金</a></td>
+        </tr>
     </table>
+
 </body>
 </html>
