@@ -346,8 +346,8 @@ def bet2():
     con = sqlite3.connect("Gamble.db")
     con.row_factory = sqlite3.Row
     cur = con.cursor()
-    date = '2023-04-16'
-    cur.execute("SELECT bet.matchId,match_info.home,match_info.away,bet.gametype,bet.gamble,bet.line FROM bet,match_info where match_info.matchId=bet.matchId and gametype = '系列賽' and date > DATE('2023-04-18') and date = (SELECT date FROM match_info WHERE date > DATE('2023-04-18') Order By date asc);")
+    date = '2023-04-15'
+    cur.execute("SELECT bet.matchId,match_info.home,match_info.away,bet.gametype,bet.gamble,bet.line FROM bet,match_info where match_info.matchId=bet.matchId and gametype = '系列賽' and date > DATE('2023-04-15') and date = (SELECT date FROM match_info WHERE date > DATE('2023-04-15') Order By date asc);")
     rows = cur.fetchall()
     return render_template('bet2.html',rows=rows)
 
@@ -372,7 +372,7 @@ def bet1_in():
     bet_win_money=cur.fetchone()[0]
     cur.execute(
         "INSERT INTO member_record (memberId, 賽事編號, 種類,下注金額,可獲得金額,中獎結果) VALUES (?, ?, ?,?,?,?)",
-        (user_id, single, project,money,bet_win_money,'未開獎'),
+        (user_id, single, project,money,bet_win_money,'未中獎'),
         )
     con.commit()
 
@@ -400,11 +400,11 @@ def bet2_in():
     cur.execute("UPDATE member_info SET money = money - ? WHERE password = ?",(money,password))
     cur.execute("SELECT money FROM member_info WHERE password = ?", (password,))
     updated_money = cur.fetchone()[0]
-    cur.execute("SELECT bet.line*? FROM bet where bet.matchId=? and bet.gamble=? and bet.gamble = '系列賽'",(money,single,project))
+    cur.execute("SELECT bet.line*? FROM bet where bet.matchId=? and bet.gamble=? and bet.gametype = '系列賽'",(money,single,project))
     bet_win_money=cur.fetchone()[0]
     cur.execute(
         "INSERT INTO member_record (memberId, 賽事編號, 種類,下注金額,可獲得金額,中獎結果) VALUES (?, ?, ?,?,?,?)",
-        (user_id, single, project,money,bet_win_money,'未開獎'),)
+        (user_id, single, project,money,bet_win_money,'未中獎'),)
     con.commit()
 
     return render_template(
@@ -431,5 +431,26 @@ def bet_record():
     rows = cur.fetchall()
     return render_template('bet_record.html',rows=rows)    
 
+#操作中獎介面
+@app.route("/operate_win")
+@login_required
+def operate_win():
+    user = current_user.id
+    return render_template("operate_win.html")
+@app.route("/operate_success",methods=["POST"])
+@login_required
+def operate_success():
+    con = sqlite3.connect("Gamble.db")
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+    user_id = current_user.id
+    single=request.form['single']
+    project=request.form['project']
+    cur.execute(
+        "UPDATE member_info SET money = money + t.可獲得金額 FROM (SELECT mr.memberId, SUM(mr.可獲得金額) AS 可獲得金額 FROM member_record mr WHERE mr.賽事編號 = ? AND mr.種類 = ? GROUP BY mr.memberId) t WHERE member_info.memberId= t.memberId",(single,project))
+    cur.execute(
+        "UPDATE member_record SET 中獎結果 = ? WHERE 賽事編號 = ? AND 種類 = ?", ("已中獎",single,project))
+    con.commit()
+    return render_template('operate_success.html',single=single,project=project)
 if __name__ == "__main__":
     app.run(debug=True)
