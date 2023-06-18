@@ -116,7 +116,7 @@ def view2():
     date = "2023-04-18"
     cur.execute(
         # "SELECT * FROM match_info WHERE date > DATE('2023-04-18') AND date = (SELECT date FROM single_match WHERE date > DATE('2023-04-18') Order By date asc);"
-        "SELECT * FROM match_info WHERE `賽事種類` = '單場賽場' Order By date;"
+        "SELECT * FROM match_info WHERE `賽gametype` = '單場賽場' Order By date;"
     )
     con.commit()
     rows = cur.fetchall()
@@ -134,7 +134,7 @@ def view3():
     con = sqlite3.connect("Gamble.db")
     con.row_factory = sqlite3.Row
     cur = con.cursor()
-    cur.execute("Select * from match_info WHERE `賽事種類` = '系列賽' Order By date")
+    cur.execute("Select * from match_info WHERE `賽gametype` = '系列賽' Order By date")
     rows = cur.fetchall()
 
     return render_template("view2.html", rows=rows,logged_in=logged_in)
@@ -345,9 +345,91 @@ def bet1():
 def bet2():
     con = sqlite3.connect("Gamble.db")
     con.row_factory = sqlite3.Row
+    cur = con.cursor()
+    date = '2023-04-16'
+    cur.execute("SELECT bet.matchId,match_info.home,match_info.away,bet.gametype,bet.gamble,bet.line FROM bet,match_info where match_info.matchId=bet.matchId and gametype = '系列賽' and date > DATE('2023-04-18') and date = (SELECT date FROM match_info WHERE date > DATE('2023-04-18') Order By date asc);")
+    rows = cur.fetchall()
+    return render_template('bet2.html',rows=rows)
 
+#下注金額頁面(單場賽事)
+@app.route("/bet1_in",methods=["POST"])
+@login_required 
+def bet1_in():
+    con = sqlite3.connect("Gamble.db")
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+    user_id = current_user.id
+    single=request.form['single']
+    project=request.form['project']
+    money=int(request.form['money'])
+    password=request.form["password"]
+    cur.execute('select money FROM member_info WHERE password = ?', (password,))
+    current_money=cur.fetchone()[0]
+    cur.execute("UPDATE member_info SET money = money - ? WHERE password = ?",(money,password))
+    cur.execute("SELECT money FROM member_info WHERE password = ?", (password,))
+    updated_money = cur.fetchone()[0]
+    cur.execute("SELECT bet.line*? FROM bet where bet.matchId=? and bet.gamble=? and bet.gametype = '單場賽事'",(money,single,project))    
+    bet_win_money=cur.fetchone()[0]
+    cur.execute(
+        "INSERT INTO member_record (memberId, 賽事編號, 種類,下注金額,可獲得金額,中獎結果) VALUES (?, ?, ?,?,?,?)",
+        (user_id, single, project,money,bet_win_money,'未開獎'),
+        )
+    con.commit()
 
-    
+    return render_template(
+        "bet_success.html",
+        money=money,
+        updated_money=updated_money,
+        user=current_user.id,
+        bet_win_money=bet_win_money)
+
+#下注金額頁面(系列賽)
+@app.route("/bet2_in",methods=["POST"])
+@login_required 
+def bet2_in():
+    con = sqlite3.connect("Gamble.db")
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+    user_id = current_user.id
+    single=request.form['single']
+    project=request.form['project']
+    money=int(request.form['money'])
+    password=request.form["password"]
+    cur.execute('select money FROM member_info WHERE password = ?', (password,))
+    current_money=cur.fetchone()[0]
+    cur.execute("UPDATE member_info SET money = money - ? WHERE password = ?",(money,password))
+    cur.execute("SELECT money FROM member_info WHERE password = ?", (password,))
+    updated_money = cur.fetchone()[0]
+    cur.execute("SELECT bet.line*? FROM bet where bet.matchId=? and bet.gamble=? and bet.gamble = '系列賽'",(money,single,project))
+    bet_win_money=cur.fetchone()[0]
+    cur.execute(
+        "INSERT INTO member_record (memberId, 賽事編號, 種類,下注金額,可獲得金額,中獎結果) VALUES (?, ?, ?,?,?,?)",
+        (user_id, single, project,money,bet_win_money,'未開獎'),)
+    con.commit()
+
+    return render_template(
+        "bet_success.html",
+        money=money,
+        updated_money=updated_money,
+        user=current_user.id,
+        bet_win_money=bet_win_money)
+#會員資料
+@app.route("/member_infor")
+@login_required 
+def member_infor():
+    user_id = current_user.id
+    return render_template('member_infor.html')
+#會員資料下注紀錄查詢
+@app.route("/bet_record")
+@login_required 
+def bet_record():
+    con = sqlite3.connect("Gamble.db")
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+    user_id = current_user.id
+    cur.execute("SELECT member_record.賽事編號,member_record.種類,member_record.下注金額,member_record.可獲得金額,member_record.中獎結果 FROM member_record where memberId=?",(user_id,))
+    rows = cur.fetchall()
+    return render_template('bet_record.html',rows=rows)    
 
 if __name__ == "__main__":
     app.run(debug=True)

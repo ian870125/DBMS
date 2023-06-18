@@ -40,15 +40,17 @@
         <th>項目</th>
         <th>下注金額</th>
         <th>最高可獲得金額</th>
+        <th>中獎結果</th>
     </tr>
     </thead>
     <tbody>
     {% for row in rows %}
         <tr>
             <td>{{row["賽事編號"]}}</td>
-            <td>{{row["項目"]}}</td>
+            <td>{{row["種類"]}}</td>
             <td>{{row["下注金額"]}}</td>
             <td>{{row["可獲得金額"]}}</td>
+            <td>{{row["中獎結果"]}}</td>
         </tr>
     {% endfor %}
     </tbody>
