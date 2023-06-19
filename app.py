@@ -405,8 +405,8 @@ def bet1_in():
     )
     bet_win_money = cur.fetchone()[0]
     cur.execute(
-        "INSERT INTO member_record (memberId, 賽事編號, 種類, 下注金額, 可獲得金額, 中獎結果) VALUES (?, ?, ?,?,?,?)",
-        (user_id, single, project, money, bet_win_money, "未開獎"),
+        "INSERT INTO member_record (memberId, 賽事編號, 種類, 下注金額, 可獲得金額,中獎結果) VALUES (?, ?, ?,?,?,?)",
+        (user_id, single, project, money, bet_win_money,"未開獎"),
     )
     con.commit()
     con.close()
@@ -446,8 +446,8 @@ def bet2_in():
     )
     bet_win_money = cur.fetchone()[0]
     cur.execute(
-        "INSERT INTO member_record (memberId, 賽事編號, 種類, 下注金額, 可獲得金額, 中獎結果) VALUES (?, ?, ?, ?, ?, ?)",
-        (user_id, single, project, money, bet_win_money, "未開獎"),
+        "INSERT INTO member_record (memberId, 賽事編號, 種類, 下注金額, 可獲得金額,中獎結果) VALUES (?, ?, ?, ?, ?,?)",
+        (user_id, single, project, money, bet_win_money,"未開獎" ),
     )
     con.commit()
     con.close()
@@ -541,13 +541,18 @@ def bet_record():
         bet_date = row["date"]
         result = row["中獎結果"]
 
+        if result == '已領獎':
         # 判断是否需要调整中獎結果
-        if bet_date <= date:
-            # 随机选择一半概率调整中獎結果
-            if random.random() < 0.5:
-                result = "已中獎"
-            else:
-                result = "未中獎"
+            continue
+        else:
+            if bet_date <= date:
+                # 随机选择一半概率调整中獎結果
+                random.seed( 10 )
+                if random.random() < 0.5:
+                    result = "已中獎"
+                else:
+                    result = "未中獎"
+        
 
         # 更新中獎結果到数据库
         cur.execute(
@@ -557,7 +562,7 @@ def bet_record():
     con.commit()
     con.close()
 
-    return render_template("bet_record.html", rows=rows)
+    return render_template("bet_record.html", rows=rows,d=date)
 
 
 # 刪除下注紀錄
@@ -566,15 +571,15 @@ def bet_record():
 def delete_record():
     data = request.get_json()
     bet_id = data["betId"]
-
     # 連接資料庫並刪除對應記錄
     con = sqlite3.connect("Gamble.db")
     cur = con.cursor()
+    cur.execute("update member_info SET money = money + 下注金額 from (SELECT 下注金額 from member_record where id = ?)",(bet_id, ))
     cur.execute("DELETE FROM member_record WHERE id=?", (bet_id,))
     con.commit()
     con.close()
 
-    return "Record deleted successfully"
+    return ("Record deleted successfully")
 
 
 # 操作中獎介面
@@ -601,7 +606,7 @@ def operate_success():
     )
     cur.execute(
         "UPDATE member_record SET 中獎結果 = ? WHERE 賽事編號 = ? AND 種類 = ?",
-        ("已中獎", single, project),
+        ("已領獎", single, project),
     )
     con.commit()
     con.close()

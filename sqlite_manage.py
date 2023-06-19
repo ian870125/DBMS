@@ -1,7 +1,7 @@
 import sqlite3
 
 # 連線到 SQLite 資料庫
-with sqlite3.connect("Gamble.db") as con:
+with sqlite3.connect("D:\研究所\資料庫\project1\DBMS\Gamble.db") as con:
     cur = con.cursor()
 
     # 將 TEXT 型態欄位轉換為 DATE 型態

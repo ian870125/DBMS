@@ -92,8 +92,8 @@
                 <td>{{ row["可獲得金額"] }}</td>
                 <td>{{ row["中獎結果"] }}</td>
                 <td>
-                    {% if row["中獎結果"] == "未開獎" %}
-                        <button class="cancel-button" onclick="deleteRow({{ loop.index }}, {{ row['id'] }})">刪除</button>
+                    {% if row["中獎結果"] == "未開獎" %}                 
+                    <button class="cancel-button" onclick="deleteRow({{ loop.index }}, {{ row['id'] }})">刪除</button>
                     {% endif %}
                 </td>
             </tr>
