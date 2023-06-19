@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>List</title>
+    <title>bet_record</title>
     <style>
         body {
             text-align: center;
@@ -17,8 +17,37 @@
             border: 1px solid black;
             padding: 8px;
         }
+        .cancel-button {
+            background-color: #ff5252;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .cancel-button:hover {
+            background-color: #ff1744;
+        }
+        .date-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
     </style>
     <link rel="stylesheet" href="{{ url_for('static',filename='styles_index.css') }}">
+    <script>
+        function deleteRow(rowId, betId) {
+            var row = document.getElementById(rowId);
+            row.parentNode.removeChild(row);
+
+            // 發送請求刪除資料庫中的對應記錄
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/delete_record", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.send(JSON.stringify({ betId: betId }));
+        }
+    </script>
 </head>
 <body class="left_body">
     <header>
@@ -34,28 +63,42 @@
         </nav>
     </header>
 
-<h3>下注紀錄查詢</h3><br>
-<table border="1">
-    <thead>
-    <tr>
-        <th>賽事編號</th>
-        <th>項目</th>
-        <th>下注金額</th>
-        <th>最高可獲得金額</th>
-        <th>中獎結果</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for row in rows %}
+    <div class="date-container">
+        <p>{{ date }}</p>
+    </div>
+
+    <h3>下注紀錄查詢</h3><br>
+    <table border="3">
+        <thead>
         <tr>
-            <td>{{row["賽事編號"]}}</td>
-            <td>{{row["種類"]}}</td>
-            <td>{{row["下注金額"]}}</td>
-            <td>{{row["可獲得金額"]}}</td>
-            <td>{{row["中獎結果"]}}</td>
+            <th>下注編號</th>
+            <th>賽事編號</th>
+            <th>比賽時間</th>
+            <th>項目</th>
+            <th>下注金額</th>
+            <th>最高可獲得金額</th>
+            <th>中獎結果</th>
+            <th>取消下注</th>
         </tr>
-    {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        {% for row in rows %}
+            <tr id="{{ loop.index }}">
+                <td>{{ row["id"] }}</td>
+                <td>{{ row["賽事編號"] }}</td>
+                <td>{{ row["date"] }}</td>
+                <td>{{ row["種類"] }}</td>
+                <td>{{ row["下注金額"] }}</td>
+                <td>{{ row["可獲得金額"] }}</td>
+                <td>{{ row["中獎結果"] }}</td>
+                <td>
+                    {% if row["中獎結果"] == "未開獎" %}
+                        <button class="cancel-button" onclick="deleteRow({{ loop.index }}, {{ row['id'] }})">刪除</button>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>

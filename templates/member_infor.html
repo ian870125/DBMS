@@ -7,6 +7,7 @@
     <style>
         body {
             text-align: center;
+            font-family: Arial, sans-serif;
         }
         .center_body {
             display: flex;
@@ -14,17 +15,44 @@
             align-items: center;
             height: 100vh;
         }
-        .member_infor {
-            border-collapse: collapse;
-            width: 300px;
-        }
-        .member_infor th, .member_infor td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: center;
-        }
-        .member_infor th {
+        .profile-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
             background-color: #f2f2f2;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+        .profile-info {
+            margin-bottom: 20px;
+        }
+        .profile-info p {
+            margin: 5px 0;
+        }
+        .profile-info p span {
+            font-weight: bold;
+        }
+        .profile-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .profile-actions a {
+            text-decoration: none;
+            background-color: red;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .profile-actions a:hover {
+            background-color: #2980b9;
         }
     </style>
 </head>
@@ -42,15 +70,20 @@
         </nav>
     </header>
 
-    <table class="member_infor">
-        <tr>
-            <th colspan="2">功能</th>
-        </tr>
-        <tr>
-            <td><a href="/bet_record">下注紀錄查詢</a></td>
-            <td><a href="/operate_win">發放獎金</a></td>
-        </tr>
-    </table>
+    <div class="profile-container">
+        <img class="profile-picture" src="{{ url_for('static', filename='profile_picture.png') }}" alt="Profile Picture">
+        <div class="profile-info">
+            <p><span>會員帳號：</span>{{ user_id }}</p>
+            <p><span>現有金額：</span>{{ current_money }}</p>
+            <p><span>儲值次數：</span>{{ in_money_time }}</p>
+            <p><span>提領次數：</span>{{ out_money_time }}</p>
+            <p><span>下注次數：</span>{{ gamble_time }}</p>
+        </div>
+        <div class="profile-actions">
+            <a href="/bet_record">下注紀錄查詢</a>
+            <a href="/operate_win">發放獎金</a>
+        </div>
+    </div>
 
 </body>
 </html>
