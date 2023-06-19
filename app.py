@@ -535,7 +535,7 @@ def bet_record():
     )
 
     rows = cur.fetchall()
-
+    i=0
     # 遍历查询结果并调整中獎結果
     for row in rows:
         bet_date = row["date"]
@@ -547,13 +547,12 @@ def bet_record():
         else:
             if bet_date <= date:
                 # 随机选择一半概率调整中獎結果
-                random.seed( 10 )
+                random.seed( i )
                 if random.random() < 0.5:
                     result = "已中獎"
                 else:
                     result = "未中獎"
-        
-
+        i+=1
         # 更新中獎結果到数据库
         cur.execute(
             "UPDATE member_record SET 中獎結果=? WHERE id=?",
@@ -601,7 +600,7 @@ def operate_success():
     single = request.form["single"]
     project = request.form["project"]
     cur.execute(
-        "UPDATE member_info SET money = money + t.可獲得金額 FROM (SELECT mr.memberId, SUM(mr.可獲得金額) AS 可獲得金額 FROM member_record mr WHERE mr.賽事編號 = ? AND mr.種類 = ? GROUP BY mr.memberId) t WHERE member_info.memberId= t.memberId",
+        "UPDATE member_info SET money = money + t.可獲得金額 FROM (SELECT mr.memberId, SUM(mr.可獲得金額) AS 可獲得金額 FROM member_record mr WHERE mr.賽事編號 = ? AND mr.種類 = ? AND mr.中獎結果 = '已中獎' GROUP BY mr.memberId) t WHERE member_info.memberId= t.memberId",
         (single, project),
     )
     cur.execute(
